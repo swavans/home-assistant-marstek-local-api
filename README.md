@@ -25,6 +25,7 @@ After adding the repository, you need to install the integration.
 1. Enable the API after access has been granted
 1. Lookup the IP of your device
 1. Setup the integration with IP and Port specified in the app
+1. Specify which domains you want.
 1. Set the scan interval to something that works for your system. Mine seems to stabilize at around once per minute but I've had different days/timings yield different results.
 
 # Functionalities
