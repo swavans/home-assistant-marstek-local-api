@@ -22,6 +22,7 @@ After adding the repository, you need to install the integration.
 ### Step 3 Setup integration
 
 After restarting, you can add and configure the integration.
+
 [![Open your Home Assistant instance and start setting up a new integration.][config-badge]][config-link]
 
 1. Request access to the local api at marstek support (if you haven't done so before)
@@ -53,4 +54,4 @@ The api spec can be found [here](https://eu.hamedata.com/ems/resource/agreement/
 [hacs-badge]: https://my.home-assistant.io/badges/hacs_repository.svg
 [hacs-link]: https://my.home-assistant.io/redirect/hacs_repository/?owner=swavans&repository=home-assistant-marstek-local-api&category=integration
 [config-badge]: https://my.home-assistant.io/badges/config_flow_start.svg
-[config-link]: https://my.home-assistant.io/redirect/config_flow_start/?domain=marstek-local-api
+[config-link]: https://my.home-assistant.io/redirect/config_flow_start/?domain=marstek_local_api
