@@ -21,7 +21,10 @@ After adding the repository, you need to install the integration.
 
 ### Step 3 Setup integration
 
-1. Request access to the local api at marstek support
+After restarting, you can add and configure the integration.
+[![Open your Home Assistant instance and start setting up a new integration.][config-badge]][config-link]
+
+1. Request access to the local api at marstek support (if you haven't done so before)
 1. Enable the API after access has been granted
 1. Lookup the IP of your device
 1. Setup the integration with IP and Port specified in the app
