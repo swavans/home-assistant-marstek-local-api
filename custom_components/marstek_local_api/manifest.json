@@ -1,9 +1,9 @@
 {
   "domain": "marstek_local_api",
   "name": "Marstek Local API",
-  "version": "0.5",
+  "version": "0.6.0",
   "codeowners": ["@swavans"],
-  "documentation": "https://eu.hamedata.com/ems/resource/agreement/MarstekDeviceOpenApi.pdf",
+  "documentation": "https://github.com/swavans/home-assistant-marstek-local-api",
   "integration_type": "device",
   "requirements": [],
   "config_flow": true,
