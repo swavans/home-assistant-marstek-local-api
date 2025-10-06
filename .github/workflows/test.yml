@@ -129,12 +129,12 @@ jobs:
 
       - name: Run integration tests
         run: |
-          python run_tests.py tests/test_init.py -v --tb=short
+          python run_tests.py tests/test_init.py -v --tb=short --no-cov
 
       - name: Test config flow integration
         run: |
-          python run_tests.py tests/test_config_flow.py -v --tb=short
+          python run_tests.py tests/test_config_flow.py -v --tb=short --no-cov
 
       - name: Test sensor integration 
         run: |
-          python run_tests.py tests/test_sensor.py::TestAsyncSetupEntry -v --tb=short
+          python run_tests.py tests/test_sensor.py::TestAsyncSetupEntry -v --tb=short --no-cov
