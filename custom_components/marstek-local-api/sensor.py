@@ -29,46 +29,51 @@ class MarstekDevice:
         scan_interval = scan_interval or 30
         self.update = Throttle(timedelta(seconds=scan_interval))(self.update)
 
+    def _send_request(self, sock, method):
+        """Send a single UDP request for a method."""
+        try:
+            _LOGGER.debug("MarstekDevice: Sending request for %s", method)
+            payload = {"id": method, "method": method, "params": {"id": 0}}
+            sock.sendto(
+                json.dumps(payload, separators=(",", ":")).encode("ascii"),
+                (self._host, self._port),
+            )
+            return self._receive_response(sock, method)
+        except Exception as e:
+            _LOGGER.error("MarstekDevice: Error sending request for %s: %s", method, e)
+            return False
+
+    def _receive_response(self, sock, method):
+        """Receive and process UDP response."""
+        try:
+            data, addr = sock.recvfrom(8192)
+            result = json.loads(data.decode())
+            _LOGGER.debug("MARSTEK RECEIVE RAW", result)
+            res_method = result.get("id")
+            res_values = result.get("result", {})
+            if res_method:
+                self._cache[res_method] = res_values
+                _LOGGER.debug(
+                    "MarstekDevice: Received data for %s: %s", res_method, res_values
+                )
+                return True
+        except socket.timeout:
+            _LOGGER.debug("MarstekDevice: No response yet for %s", method)
+        except Exception as e:
+            _LOGGER.error("MarstekDevice: Error receiving response for %s: %s", method, e)
+        return False
+
     def update(self):
         _LOGGER.debug("MarstekDevice: Starting update cycle")
+        sock = None
         try:
             sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             sock.settimeout(2.0)
-            # Use ephemeral port (0) instead of binding to target port
             sock.bind(("0.0.0.0", 0))
 
             for method in self._methods:
-                try:
-                    _LOGGER.debug("MarstekDevice: Sending request for %s", method)
-                    payload = {"id": method, "method": method, "params": {"id": 0}}
-                    sock.sendto(
-                        json.dumps(payload, separators=(",", ":")).encode("ascii"),
-                        (self._host, self._port),
-                    )
-
-                    # Attempt to receive response (non-blocking)
-                    try:
-                        data, addr = sock.recvfrom(8192)
-                        result = json.loads(data.decode())
-                        _LOGGER.debug("MARSTEK RECEIVE RAW", result)
-                        res_method = result.get("id")
-                        res_values = result.get("result", {})
-                        if res_method:
-                            self._cache[res_method] = res_values
-                            _LOGGER.debug(
-                                "MarstekDevice: Received data for %s: %s",
-                                res_method,
-                                res_values,
-                            )
-                    except socket.timeout:
-                        _LOGGER.debug("MarstekDevice: No response yet for %s", method)
-
-                except Exception as e:
-                    _LOGGER.error(
-                        "MarstekDevice: Error sending request for %s: %s", method, e
-                    )
-                finally:
-                    time.sleep(0.5)
+                self._send_request(sock, method)
+                time.sleep(0.5)
 
             # Ensure all methods have at least empty cache
             for method in self._methods:
@@ -78,10 +83,11 @@ class MarstekDevice:
         except Exception as e:
             _LOGGER.error("MarstekDevice: Socket setup failed: %s", e)
         finally:
-            try:
-                sock.close()
-            except Exception:
-                pass
+            if sock:
+                try:
+                    sock.close()
+                except Exception:
+                    pass
 
     def get_value(self, method, key):
         return self._cache.get(method, {}).get(key)
