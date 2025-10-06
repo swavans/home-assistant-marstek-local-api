@@ -17,11 +17,12 @@ _LOGGER = logging.getLogger(__name__)
 class MarstekDevice:
     """Manages UDP communication and caches results per method."""
 
-    def __init__(self, host, port, methods, scan_interval):
+    def __init__(self, host, port, methods, scan_interval, name):
         self._host = host
         self._port = port
         self._methods = methods
         self._cache = {}
+        self._name = name
         self.update = Throttle(timedelta(seconds=scan_interval))(self.update)
 
     def update(self):
@@ -90,8 +91,8 @@ class MarstekBaseSensor(SensorEntity):
         self._device = device
         self._method = method
         self._key = key
-        self._attr_name = f"{CONF_DEVICE_NAME}{name}"
-        self._attr_unique_id = f"marstek_ local_{CONF_DEVICE_NAME.lower()}_{method.lower()}_{key}"
+        self._attr_name = f"{name}"
+        self._attr_unique_id = f"marstek_local_{device._name.replace(" ", "_").lower()}_{method.lower()}_{key}"
         self._unit = unit
         self._state = None
         self._transform = transform
@@ -136,7 +137,9 @@ async def async_setup_entry(hass, entry, async_add_entities):
     scan_interval = entry.data.get(CONF_SCAN_INTERVAL)
     
     chosen_domains = entry.data.get(CONF_DOMAINS, list(OPTIONS.keys()))
-    device = MarstekDevice(host, port, chosen_domains, scan_interval)
+    device_name = entry.data.get(CONF_DEVICE_NAME, "Marstek Battery")
+
+    device = MarstekDevice(host, port, chosen_domains, scan_interval, device_name)
 
     sensors_def = [
         # Wifi
