@@ -69,7 +69,7 @@ class MarstekDevice:
         try:
             sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             sock.settimeout(2.0)
-            sock.bind(("0.0.0.0", 0))
+            sock.bind(("0.0.0.0", self._port))
 
             for method in self._methods:
                 self._send_request(sock, method)
