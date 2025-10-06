@@ -3,7 +3,7 @@ import homeassistant.helpers.config_validation as cv
 
 from homeassistant import config_entries
 from homeassistant.const import CONF_HOST, CONF_PORT, CONF_SCAN_INTERVAL
-from .const import DOMAIN, CONF_DOMAINS, OPTIONS
+from .const import DOMAIN, CONF_DOMAINS, OPTIONS, CONF_DEVICE_NAME
 
 
 class MarstekConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
@@ -23,6 +23,7 @@ class MarstekConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             {
                 vol.Required(CONF_HOST): str,
                 vol.Required(CONF_PORT, default=30000): int,
+                vol.Required(CONF_DEVICE_NAME, default="Marstek Battery"): str,
                 vol.Optional(CONF_SCAN_INTERVAL, default=10): int,
                 vol.Optional(
                     CONF_DOMAINS,

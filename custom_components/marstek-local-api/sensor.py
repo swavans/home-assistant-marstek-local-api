@@ -9,7 +9,7 @@ from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.util import Throttle
 from homeassistant.const import CONF_HOST, CONF_PORT, CONF_SCAN_INTERVAL
 
-from .const import DOMAIN, CONF_DOMAINS, OPTIONS
+from .const import DOMAIN, CONF_DOMAINS, OPTIONS, CONF_DEVICE_NAME
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -90,8 +90,8 @@ class MarstekBaseSensor(SensorEntity):
         self._device = device
         self._method = method
         self._key = key
-        self._attr_name = f"{name}"
-        self._attr_unique_id = f"marstek_ battery_{method.lower()}_{key}"
+        self._attr_name = f"{CONF_DEVICE_NAME}{name}"
+        self._attr_unique_id = f"marstek_ local_{CONF_DEVICE_NAME.lower()}_{method.lower()}_{key}"
         self._unit = unit
         self._state = None
         self._transform = transform

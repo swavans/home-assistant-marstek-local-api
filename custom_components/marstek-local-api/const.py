@@ -10,3 +10,4 @@ OPTIONS = {
     "BLE.GetStatus": "Bluetooth Status",
     "ES.GetMode": "Charging Strategy"
 }
+CONF_DEVICE_NAME = "device_name"
