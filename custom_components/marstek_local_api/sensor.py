@@ -93,7 +93,7 @@ class MarstekBaseSensor(SensorEntity):
         self._device = device
         self._method = method
         self._key = key
-        self._attr_name = f"{device._device_name} {name}"
+        self._attr_name = f"{name}"
         self._attr_unique_id = f"marstek_local_{device._device_name.replace(' ', '_').lower()}_{method.lower()}_{key}"
         self._unit = unit
         self._state = None
@@ -185,8 +185,8 @@ async def async_setup_entry(hass, entry, async_add_entities):
 
         # Charging Status
         ( "ES.GetMode", "mode", "Charging mode", None, None),
-        ( "ES.GetMode", "ongrid_power", "Discharging", "W", lambda v: float(v)),
-        ( "ES.GetMode", "offgrid_power", "Charging", "W", lambda v: float(v)),
+        ( "ES.GetMode", "ongrid_power", "Ongrid power", "W", lambda v: float(v)),
+        ( "ES.GetMode", "offgrid_power", "Offgrid power (backup power)", "W", lambda v: float(v)),
         ( "ES.GetMode", "bat_soc", "Battery %", "%", None),
     ]
 
