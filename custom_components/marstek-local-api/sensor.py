@@ -93,7 +93,7 @@ class MarstekBaseSensor(SensorEntity):
         self._device = device
         self._method = method
         self._key = key
-        self._attr_name = f"{name}"
+        self._attr_name = f"{device._device_name} {name}"
         self._attr_unique_id = f"marstek_local_{device._device_name.replace(' ', '_').lower()}_{method.lower()}_{key}"
         self._unit = unit
         self._state = None
