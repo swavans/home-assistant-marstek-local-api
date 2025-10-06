@@ -8,6 +8,6 @@ OPTIONS = {
     "PV.GetStatus": "Connected Solar Status",
     "ES.GetStatus": "Energy Management System Status",
     "BLE.GetStatus": "Bluetooth Status",
-    "ES.GetMode": "Charging Strategy"
+    "ES.GetMode": "Charging Strategy",
 }
 CONF_DEVICE_NAME = "Device Name"

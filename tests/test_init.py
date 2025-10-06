@@ -1,10 +1,11 @@
 """Tests for the Marstek Local API integration init module."""
-import pytest
-import sys
 import os
+import sys
 from unittest.mock import AsyncMock, patch
-from homeassistant.core import HomeAssistant
+
+import pytest
 from homeassistant.const import CONF_HOST, CONF_PORT
+from homeassistant.core import HomeAssistant
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 # Add the project root to Python path
@@ -13,10 +14,10 @@ if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
 from custom_components.marstek_local_api import (
+    DOMAIN,
     async_setup,
     async_setup_entry,
     async_unload_entry,
-    DOMAIN,
 )
 
 

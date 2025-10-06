@@ -1,11 +1,14 @@
 import logging
+
 from homeassistant.const import CONF_HOST, CONF_PORT
 
 DOMAIN = "marstek_local_api"
 _LOGGER = logging.getLogger(__name__)
 
+
 async def async_setup(hass, config):
     return True
+
 
 async def async_setup_entry(hass, entry):
     hass.data.setdefault(DOMAIN, {})
@@ -17,6 +20,7 @@ async def async_setup_entry(hass, entry):
     # Nieuwere API: meerdere platforms tegelijk
     await hass.config_entries.async_forward_entry_setups(entry, ["sensor"])
     return True
+
 
 async def async_unload_entry(hass, entry):
     # Nieuwere API: netjes ontladen

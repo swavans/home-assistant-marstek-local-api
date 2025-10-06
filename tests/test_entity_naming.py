@@ -1,14 +1,15 @@
 """Test the entity naming with device name."""
-import pytest
-import sys
 import os
+import sys
+
+import pytest
 
 # Add the project root to Python path
 project_root = os.path.dirname(os.path.dirname(__file__))
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
-from custom_components.marstek_local_api.sensor import MarstekDevice, MarstekBaseSensor
+from custom_components.marstek_local_api.sensor import MarstekBaseSensor, MarstekDevice
 
 
 def test_entity_naming_with_device_name():

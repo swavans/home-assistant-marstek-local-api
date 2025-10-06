@@ -1,9 +1,9 @@
-import voluptuous as vol
 import homeassistant.helpers.config_validation as cv
-
+import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.const import CONF_HOST, CONF_PORT, CONF_SCAN_INTERVAL
-from .const import DOMAIN, CONF_DOMAINS, OPTIONS, CONF_DEVICE_NAME
+
+from .const import CONF_DEVICE_NAME, CONF_DOMAINS, DOMAIN, OPTIONS
 
 
 class MarstekConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
@@ -14,10 +14,7 @@ class MarstekConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_user(self, user_input=None):
         """Handle the initial step."""
         if user_input is not None:
-            return self.async_create_entry(
-                title="Marstek Battery",
-                data=user_input
-            )
+            return self.async_create_entry(title="Marstek Battery", data=user_input)
 
         schema = vol.Schema(
             {
@@ -26,8 +23,7 @@ class MarstekConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 vol.Required(CONF_DEVICE_NAME, default="Marstek Battery"): str,
                 vol.Optional(CONF_SCAN_INTERVAL, default=30): int,
                 vol.Optional(
-                    CONF_DOMAINS,
-                    default=list(OPTIONS.keys())
+                    CONF_DOMAINS, default=list(OPTIONS.keys())
                 ): cv.multi_select(OPTIONS),
             }
         )

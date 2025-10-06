@@ -1,7 +1,8 @@
 """Tests for MarstekConfigFlow."""
-import pytest
-import sys
 import os
+import sys
+
+import pytest
 import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.const import CONF_HOST, CONF_PORT, CONF_SCAN_INTERVAL
@@ -13,7 +14,12 @@ if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
 from custom_components.marstek_local_api.config_flow import MarstekConfigFlow
-from custom_components.marstek_local_api.const import DOMAIN, CONF_DOMAINS, OPTIONS, CONF_DEVICE_NAME
+from custom_components.marstek_local_api.const import (
+    CONF_DEVICE_NAME,
+    CONF_DOMAINS,
+    DOMAIN,
+    OPTIONS,
+)
 
 
 class TestMarstekConfigFlow:

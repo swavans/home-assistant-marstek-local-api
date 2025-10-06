@@ -1,12 +1,13 @@
 """Tests for MarstekDevice class."""
-import pytest
-import socket
 import json
-import time
-import sys
 import os
-from unittest.mock import Mock, patch, call
+import socket
+import sys
+import time
 from datetime import timedelta
+from unittest.mock import Mock, call, patch
+
+import pytest
 
 # Add the project root to Python path
 project_root = os.path.dirname(os.path.dirname(__file__))

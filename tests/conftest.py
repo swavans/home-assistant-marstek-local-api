@@ -1,14 +1,14 @@
 """Fixtures for Marstek Local API tests."""
-import pytest
+import os
 import socket
 import sys
-import os
-from unittest.mock import Mock, patch, MagicMock
 from datetime import timedelta
+from unittest.mock import MagicMock, Mock, patch
 
-from homeassistant.core import HomeAssistant
+import pytest
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_HOST, CONF_PORT, CONF_SCAN_INTERVAL
+from homeassistant.core import HomeAssistant
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 # Add the project root to Python path
@@ -18,10 +18,10 @@ if project_root not in sys.path:
 
 # Import the Marstek Local API components
 from custom_components.marstek_local_api.const import (
-    DOMAIN, 
-    CONF_DOMAINS, 
     CONF_DEVICE_NAME,
-    OPTIONS
+    CONF_DOMAINS,
+    DOMAIN,
+    OPTIONS,
 )
 from custom_components.marstek_local_api.sensor import MarstekDevice
 
