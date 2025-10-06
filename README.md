@@ -6,6 +6,8 @@ For more info see [Marsteks Faq](https://marstek-power.eu/en/Frequently-Asked-Qu
 
 # Setup
 
+## Option 1: Install via HACS (Recommended)
+
 ### Step 1: Add Repository to HACS
 
 [![Open your Home Assistant instance and add a custom repository][hacs-badge]][hacs-link]
@@ -18,6 +20,16 @@ After adding the repository, you need to install the integration.
 2.  Search for **"Marstek Local API"** and click on it.
 3.  Click the **DOWNLOAD** button and wait for the installation to complete.
 4.  **Restart Home Assistant** when prompted.
+
+## Option 2: Manual Installation
+
+If HACS installation doesn't work, you can install manually:
+
+1. Download the latest release from the [GitHub releases page](https://github.com/swavans/home-assistant-marstek-local-api/releases)
+2. Extract the contents
+3. Copy the `custom_components/marstek-local-api` folder to your Home Assistant `config/custom_components/` directory
+4. Restart Home Assistant
+5. Add the integration through the UI
 
 ### Step 3 Setup integration
 

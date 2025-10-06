@@ -1,3 +1,8 @@
 {
-    "name": "Marstek Local API"
+    "name": "Marstek Local API",
+    "content_in_root": false,
+    "filename": "marstek-local-api",
+    "country": ["US", "CA", "GB", "AU"],
+    "render_readme": true,
+    "iot_class": "Local Polling"
 }
