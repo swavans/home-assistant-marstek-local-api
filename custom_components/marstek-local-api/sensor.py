@@ -32,7 +32,8 @@ class MarstekDevice:
         try:
             sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             sock.settimeout(2.0)
-            sock.bind(("0.0.0.0", self._port))  # ephemeral port
+            # Use ephemeral port (0) instead of binding to target port
+            sock.bind(("0.0.0.0", 0))
 
             for method in self._methods:
                 try:
@@ -93,7 +94,7 @@ class MarstekBaseSensor(SensorEntity):
         self._device = device
         self._method = method
         self._key = key
-        self._attr_name = f"{name}"
+        self._attr_name = f"{device._device_name} {name}"
         self._attr_unique_id = f"marstek_local_{device._device_name.replace(' ', '_').lower()}_{method.lower()}_{key}"
         self._unit = unit
         self._state = None
@@ -153,10 +154,8 @@ async def async_setup_entry(hass, entry, async_add_entities):
 
         # Battery
         ("Bat.GetStatus", "soc", "Battery SOC", "%", None),
-        ("Bat.GetStatus", "bat_temp", "Battery Temp", "°C",
-            lambda v: v / 10 if isinstance(v, (int, float)) else v),
-        ("Bat.GetStatus", "bat_capacity", "Battery Capacity", "Wh",
-            lambda v: v * 10 if isinstance(v, (int, float)) else v),
+        ("Bat.GetStatus", "bat_temp", "Battery Temp", "°C", None),  # API docs show temp is already in °C
+        ("Bat.GetStatus", "bat_capacity", "Battery Capacity", "Wh", None),  # API docs show capacity is already in Wh
         ("Bat.GetStatus", "rated_capacity", "Battery Rated Capacity", "Wh", None),
         ("Bat.GetStatus", "charg_flag", "Battery Charging Flag", None, lambda v: bool(v) if v is not None else False),
         ("Bat.GetStatus", "dischrg_flag", "Battery Discharging Flag", None, lambda v: bool(v) if v is not None else False),
@@ -184,10 +183,10 @@ async def async_setup_entry(hass, entry, async_add_entities):
         ("BLE.GetStatus", "ble_mac", "BLE MAC", None, None),
 
         # Charging Status
-        ( "ES.GetMode", "mode", "Charging mode", None, None),
-        ( "ES.GetMode", "ongrid_power", "Ongrid power", "W", lambda v: float(v)),
-        ( "ES.GetMode", "offgrid_power", "Offgrid power (backup power)", "W", lambda v: float(v)),
-        ( "ES.GetMode", "bat_soc", "Battery %", "%", None),
+        ("ES.GetMode", "mode", "Charging mode", None, None),
+        ("ES.GetMode", "ongrid_power", "Ongrid power", "W", lambda v: float(v)),
+        ("ES.GetMode", "offgrid_power", "Offgrid power (backup power)", "W", lambda v: float(v)),
+        ("ES.GetMode", "bat_soc", "Battery %", "%", None),
     ]
 
     entities = [

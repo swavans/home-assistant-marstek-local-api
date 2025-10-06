@@ -43,11 +43,11 @@ jobs:
         
     - name: Type check with mypy
       run: |
-        mypy custom_components/marstek_local_api/ --ignore-missing-imports
+        mypy custom_components/marstek-local-api/ --ignore-missing-imports
         
     - name: Test with pytest
       run: |
-        pytest --cov=custom_components.marstek_local_api --cov-report=xml --cov-report=term-missing
+        python run_tests.py tests/ --cov=custom_components.marstek-local-api --cov-report=xml --cov-report=term-missing
         
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
@@ -78,9 +78,13 @@ jobs:
         run: |
           python -c "
           import sys
+          import os
           sys.path.insert(0, '.')
+          # Add the marstek-local-api directory to path so we can import it
+          marstek_dir = os.path.join('.', 'custom_components', 'marstek-local-api')
+          sys.path.insert(0, marstek_dir)
           try:
-              from custom_components.marstek_local_api import DOMAIN
+              from const import DOMAIN
               print(f'✓ Component {DOMAIN} loads successfully')
           except Exception as e:
               print(f'✗ Component failed to load: {e}')
@@ -93,7 +97,7 @@ jobs:
           import json
           import sys
           try:
-              with open('custom_components/marstek_local_api/manifest.json') as f:
+              with open('custom_components/marstek-local-api/manifest.json') as f:
                   manifest = json.load(f)
               required_fields = ['domain', 'name', 'version', 'documentation', 'integration_type']
               for field in required_fields:
@@ -127,12 +131,12 @@ jobs:
 
       - name: Run integration tests
         run: |
-          pytest tests/test_init.py -v --tb=short
+          python run_tests.py tests/test_init.py -v --tb=short
 
       - name: Test config flow integration
         run: |
-          pytest tests/test_config_flow.py -v --tb=short
+          python run_tests.py tests/test_config_flow.py -v --tb=short
 
       - name: Test sensor integration 
         run: |
-          pytest tests/test_sensor.py::TestAsyncSetupEntry -v --tb=short
+          python run_tests.py tests/test_sensor.py::TestAsyncSetupEntry -v --tb=short
