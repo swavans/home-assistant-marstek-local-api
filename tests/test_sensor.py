@@ -331,18 +331,18 @@ class TestAsyncSetupEntry:
         entities = mock_add_entities.call_args[0][0]
         
         # Find sensors with transforms
-        temp_sensors = [e for e in entities if e._key == "bat_temp"]
-        capacity_sensors = [e for e in entities if e._key == "bat_capacity"]
-        float_sensors = [e for e in entities if e._key == "ongrid_power" and e._method == "ES.GetMode"]
+        charg_flag_sensors = [e for e in entities if e._key == "charg_flag"]
+        ongrid_power_sensors = [e for e in entities if e._key == "ongrid_power" and e._method == "ES.GetMode"]
+        offgrid_power_sensors = [e for e in entities if e._key == "offgrid_power" and e._method == "ES.GetMode"]
         
-        assert len(temp_sensors) == 1
-        assert len(capacity_sensors) == 1
-        assert len(float_sensors) == 1
+        assert len(charg_flag_sensors) == 1
+        assert len(ongrid_power_sensors) == 1
+        assert len(offgrid_power_sensors) == 1
 
         # Check that transforms are assigned
-        assert temp_sensors[0]._transform is not None
-        assert capacity_sensors[0]._transform is not None
-        assert float_sensors[0]._transform is not None
+        assert charg_flag_sensors[0]._transform is not None
+        assert ongrid_power_sensors[0]._transform is not None
+        assert offgrid_power_sensors[0]._transform is not None
 
     @pytest.mark.asyncio
     async def test_async_setup_entry_empty_domains(self, hass):
