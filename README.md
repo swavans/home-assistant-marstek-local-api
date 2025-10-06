@@ -47,9 +47,120 @@ Keep in mind that the API seems to fail quite often in the current firmware whic
 See what works for your device/version but my current setup is 60 seconds which seems to be stable.
 
 
-# Contribute
+## Development
+
+### Testing
+
+This project includes comprehensive unit tests to ensure reliability and maintainability.
+
+### Prerequisites
+
+Install the testing dependencies:
+
+```bash
+pip install -r requirements-test.txt
+```
+
+### Running Tests
+
+Run all tests:
+
+```bash
+pytest
+```
+
+Run tests with coverage:
+
+```bash
+pytest --cov=custom_components.marstek_local_api --cov-report=html --cov-report=term-missing
+```
+
+Run specific test files:
+
+```bash
+pytest tests/test_device.py -v
+pytest tests/test_sensor.py -v
+pytest tests/test_config_flow.py -v
+pytest tests/test_init.py -v
+```
+
+Run only unit tests (fast):
+
+```bash
+pytest -m "unit"
+```
+
+Run only integration tests:
+
+```bash
+pytest -m "integration"
+```
+
+### Test Coverage
+
+The test suite covers:
+
+- **UDP Communication**: Socket handling, timeouts, error recovery
+- **Device Management**: Data caching, method handling, throttling
+- **Sensor Entities**: State updates, transforms, device info
+- **Config Flow**: User input validation, form handling
+- **Integration Setup**: Entry loading/unloading, platform forwarding
+
+Current test coverage target is 80%+.
+
+### Code Quality
+
+The project uses several tools to maintain code quality:
+
+```bash
+# Check code formatting
+black --check custom_components/ tests/
+
+# Format code
+black custom_components/ tests/
+
+# Check import sorting
+isort --check-only custom_components/ tests/
+
+# Sort imports
+isort custom_components/ tests/
+
+# Lint code
+flake8 custom_components/ tests/
+
+# Type checking
+mypy custom_components/marstek_local_api/
+```
+
+### GitHub Actions
+
+The project includes automated testing via GitHub Actions that runs on:
+
+- Push to main/develop branches
+- Pull requests to main branch
+
+The workflow tests multiple Python versions (3.11, 3.12) and includes:
+
+- Unit tests with coverage reporting
+- Code formatting checks
+- Import sorting verification
+- Type checking
+- Home Assistant component validation
+- Integration testing
+
+## Contribute
+
 If you want to contribute feel free too. This is my first home assistant integration and also my first python project.
-The api spec can be found [here](https://eu.hamedata.com/ems/resource/agreement/MarstekDeviceOpenApi.pdf)
+The API specification can be found in the [Marstek Device Open API documentation](https://eu.hamedata.com/ems/resource/agreement/MarstekDeviceOpenApi.pdf).
+
+When contributing:
+
+1. Fork the repository
+2. Create a feature branch
+3. Add tests for new functionality
+4. Ensure all tests pass and coverage remains high
+5. Run code quality checks
+6. Submit a pull request
 
 [hacs-badge]: https://my.home-assistant.io/badges/hacs_repository.svg
 [hacs-link]: https://my.home-assistant.io/redirect/hacs_repository/?owner=swavans&repository=home-assistant-marstek-local-api&category=integration

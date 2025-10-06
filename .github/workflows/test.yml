@@ -1,0 +1,138 @@
+name: Test
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.11, 3.12]
+        
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements-test.txt
+        
+    - name: Lint with flake8
+      run: |
+        # stop the build if there are Python syntax errors or undefined names
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+        
+    - name: Check code formatting with black
+      run: |
+        black --check --diff custom_components/ tests/
+        
+    - name: Check import sorting with isort
+      run: |
+        isort --check-only --diff custom_components/ tests/
+        
+    - name: Type check with mypy
+      run: |
+        mypy custom_components/marstek_local_api/ --ignore-missing-imports
+        
+    - name: Test with pytest
+      run: |
+        pytest --cov=custom_components.marstek_local_api --cov-report=xml --cov-report=term-missing
+        
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: false
+
+  hass-lint:
+    runs-on: ubuntu-latest
+    name: "Home Assistant Core Lint"
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install Home Assistant
+        run: |
+          python -m pip install --upgrade pip
+          pip install homeassistant
+
+      - name: Check component loads
+        run: |
+          python -c "
+          import sys
+          sys.path.insert(0, '.')
+          try:
+              from custom_components.marstek_local_api import DOMAIN
+              print(f'✓ Component {DOMAIN} loads successfully')
+          except Exception as e:
+              print(f'✗ Component failed to load: {e}')
+              sys.exit(1)
+          "
+
+      - name: Validate manifest
+        run: |
+          python -c "
+          import json
+          import sys
+          try:
+              with open('custom_components/marstek_local_api/manifest.json') as f:
+                  manifest = json.load(f)
+              required_fields = ['domain', 'name', 'version', 'documentation', 'integration_type']
+              for field in required_fields:
+                  if field not in manifest:
+                      print(f'✗ Missing required field: {field}')
+                      sys.exit(1)
+              print('✓ Manifest validation passed')
+          except Exception as e:
+              print(f'✗ Manifest validation failed: {e}')
+              sys.exit(1)
+          "
+
+  integration-test:
+    runs-on: ubuntu-latest
+    name: "Integration Test"
+    needs: test
+    
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-test.txt
+
+      - name: Run integration tests
+        run: |
+          pytest tests/test_init.py -v --tb=short
+
+      - name: Test config flow integration
+        run: |
+          pytest tests/test_config_flow.py -v --tb=short
+
+      - name: Test sensor integration 
+        run: |
+          pytest tests/test_sensor.py::TestAsyncSetupEntry -v --tb=short
