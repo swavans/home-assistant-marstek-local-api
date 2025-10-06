@@ -23,6 +23,8 @@ class MarstekDevice:
         self._methods = methods
         self._device_name = device_name
         self._cache = {}
+        # Handle None scan_interval by using a default of 10 seconds
+        scan_interval = scan_interval or 30
         self.update = Throttle(timedelta(seconds=scan_interval))(self.update)
 
     def update(self):

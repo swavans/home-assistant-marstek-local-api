@@ -22,5 +22,5 @@ async def async_unload_entry(hass, entry):
     # Nieuwere API: netjes ontladen
     unload_ok = await hass.config_entries.async_unload_platforms(entry, ["sensor"])
     if unload_ok:
-        hass.data[DOMAIN].pop(entry.entry_id)
+        hass.data[DOMAIN].pop(entry.entry_id, None)
     return unload_ok

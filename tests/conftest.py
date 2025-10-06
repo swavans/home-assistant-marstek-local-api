@@ -113,12 +113,13 @@ def mock_device(mock_device_data):
     device._host = "192.168.1.100"
     device._port = 30000
     device._methods = ["Bat.GetStatus", "Wifi.GetStatus"]
+    device._device_name = "Test Marstek Battery"
     device._cache = mock_device_data.copy()
     
     def mock_get_value(method, key):
         return device._cache.get(method, {}).get(key)
     
-    device.get_value = mock_get_value
+    device.get_value = Mock(side_effect=mock_get_value)
     device.update = Mock()
     
     return device
@@ -163,140 +164,3 @@ def mock_throttle():
         mock_throttle.side_effect = lambda delta: lambda func: func
         yield mock_throttle
 
-
-@pytest.fixture
-def mock_config_entry():
-    """Return a mock config entry."""
-    return MockConfigEntry(
-        domain=DOMAIN,
-        data={
-            CONF_HOST: "192.168.1.100",
-            CONF_PORT: 30000,
-            CONF_DEVICE_NAME: "Test Marstek Battery",
-            CONF_SCAN_INTERVAL: 10,
-            CONF_DOMAINS: ["Bat.GetStatus", "Wifi.GetStatus"],
-        },
-        entry_id="test_entry",
-        unique_id="test_unique_id",
-    )
-
-
-@pytest.fixture
-def mock_socket():
-    """Mock socket for UDP communication."""
-    with patch("socket.socket") as mock_socket_class:
-        mock_sock = Mock()
-        mock_socket_class.return_value = mock_sock
-        mock_sock.bind.return_value = None
-        mock_sock.sendto.return_value = None
-        mock_sock.settimeout.return_value = None
-        mock_sock.close.return_value = None
-        yield mock_sock
-
-
-@pytest.fixture
-def mock_device_data():
-    """Mock device response data."""
-    return {
-        "Bat.GetStatus": {
-            "soc": 85,
-            "bat_temp": 250,  # 25.0°C
-            "bat_capacity": 500,  # 5000Wh
-            "rated_capacity": 5000,
-            "charg_flag": 1,
-            "dischrg_flag": 0,
-        },
-        "Wifi.GetStatus": {
-            "ssid": "TestNetwork",
-            "rssi": -45,
-            "sta_ip": "192.168.1.100",
-            "sta_gate": "192.168.1.1",
-            "sta_mask": "255.255.255.0",
-            "sta_dns": "8.8.8.8",
-        },
-        "PV.GetStatus": {
-            "pv_power": 1500,
-            "pv_voltage": 48.5,
-            "pv_current": 31.0,
-        },
-        "ES.GetStatus": {
-            "bat_soc": 85,
-            "bat_cap": 5000,
-            "pv_power": 1500,
-            "ongrid_power": 200,
-            "offgrid_power": 0,
-            "bat_power": -300,
-            "total_pv_energy": 150000,
-            "total_grid_output_energy": 5000,
-            "total_grid_input_energy": 2000,
-            "total_load_energy": 45000,
-        },
-        "BLE.GetStatus": {
-            "state": "connected",
-            "ble_mac": "AA:BB:CC:DD:EE:FF",
-        },
-        "ES.GetMode": {
-            "mode": "auto",
-            "ongrid_power": 200.0,
-            "offgrid_power": 0.0,
-            "bat_soc": 85,
-        },
-    }
-
-
-@pytest.fixture
-def mock_device(mock_device_data):
-    """Mock MarstekDevice with test data."""
-    device = Mock(spec=MarstekDevice)
-    device._host = "192.168.1.100"
-    device._port = 30000
-    device._methods = ["Bat.GetStatus", "Wifi.GetStatus"]
-    device._cache = mock_device_data.copy()
-    
-    def mock_get_value(method, key):
-        return device._cache.get(method, {}).get(key)
-    
-    device.get_value = mock_get_value
-    device.update = Mock()
-    
-    return device
-
-
-@pytest.fixture
-def mock_json_response():
-    """Mock JSON response from device."""
-    def _mock_response(method, data):
-        return {
-            "id": method,
-            "result": data,
-            "error": None
-        }
-    return _mock_response
-
-
-@pytest.fixture
-def mock_socket_recv(mock_json_response, mock_device_data):
-    """Mock socket receive with proper JSON responses."""
-    def _mock_recv(method="Bat.GetStatus"):
-        data = mock_device_data.get(method, {})
-        response = mock_json_response(method, data)
-        import json
-        return json.dumps(response).encode(), ("192.168.1.100", 30000)
-    
-    return _mock_recv
-
-
-@pytest.fixture
-def mock_time():
-    """Mock time.sleep to speed up tests."""
-    with patch("time.sleep"):
-        yield
-
-
-@pytest.fixture
-def mock_throttle():
-    """Mock throttle decorator to remove timing restrictions in tests."""
-    with patch("homeassistant.util.Throttle") as mock_throttle:
-        # Make throttle return the original function unchanged
-        mock_throttle.side_effect = lambda delta: lambda func: func
-        yield mock_throttle

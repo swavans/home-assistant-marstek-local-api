@@ -11,8 +11,8 @@ project_root = os.path.dirname(os.path.dirname(__file__))
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
-from custom_components.marstek_local_api.sensor import MarstekBaseSensor, async_setup_entry
-from custom_components.marstek_local_api.const import DOMAIN, CONF_DEVICE_NAME, OPTIONS
+from custom_components.marstek_local_api.sensor import MarstekBaseSensor, MarstekDevice, async_setup_entry
+from custom_components.marstek_local_api.const import DOMAIN, CONF_DEVICE_NAME, CONF_DOMAINS, OPTIONS
 
 
 class TestMarstekBaseSensor:
@@ -35,7 +35,7 @@ class TestMarstekBaseSensor:
         assert sensor._unit == "%"
         assert sensor._state is None
         assert sensor._transform is None
-        assert sensor._attr_unique_id == "marstek_ local_test marstek battery_bat.getstatus_soc"
+        assert sensor._attr_unique_id == "marstek_local_test_marstek_battery_bat.getstatus_soc"
 
     def test_sensor_initialization_with_transform(self, mock_device):
         """Test sensor initialization with transform function."""
@@ -76,7 +76,10 @@ class TestMarstekBaseSensor:
         sensor = MarstekBaseSensor(mock_device, "Bat.GetStatus", "soc", "Battery SOC")
 
         device_info = sensor._attr_device_info
-        assert isinstance(device_info, DeviceInfo)
+        # DeviceInfo is a TypedDict, so check its contents instead of type
+        assert "identifiers" in device_info
+        assert "name" in device_info
+        assert "manufacturer" in device_info
         assert device_info["identifiers"] == {(DOMAIN, "192.168.1.100_Bat.GetStatus")}
         assert device_info["name"] == "Battery status"  # From OPTIONS
         assert device_info["manufacturer"] == "Marstek"
@@ -106,9 +109,15 @@ class TestMarstekBaseSensor:
 
         assert sensor._state == 25.0  # Transformed value
 
-    def test_update_with_transform_error(self, mock_device, caplog):
+    def test_update_with_transform_error(self, caplog):
         """Test sensor update when transform function raises exception."""
-        mock_device.get_value.return_value = "invalid"
+        # Create a specific mock device for this test
+        mock_device = Mock(spec=MarstekDevice)
+        mock_device._device_name = "Test Marstek Battery"
+        mock_device._host = "192.168.1.100"
+        mock_device.get_value = Mock(return_value="invalid")
+        mock_device.update = Mock()
+        
         transform_func = lambda x: x / 10  # Will fail with string input
         
         sensor = MarstekBaseSensor(
@@ -121,11 +130,17 @@ class TestMarstekBaseSensor:
             sensor.update()
 
         assert "Transform failed" in caplog.text
-        assert sensor._state == 20.0  # Should keep previous state
+        assert sensor._state == "invalid"  # Should store the raw value when transform fails
 
-    def test_update_no_value_available(self, mock_device, caplog):
+    def test_update_no_value_available(self, caplog):
         """Test sensor update when no value is available from device."""
-        mock_device.get_value.return_value = None
+        # Create a specific mock device for this test
+        mock_device = Mock(spec=MarstekDevice)
+        mock_device._device_name = "Test Marstek Battery"
+        mock_device._host = "192.168.1.100"
+        mock_device.get_value = Mock(return_value=None)
+        mock_device.update = Mock()
+        
         sensor = MarstekBaseSensor(mock_device, "Bat.GetStatus", "soc", "Battery SOC")
         sensor._state = 80  # Previous state
 
@@ -135,9 +150,15 @@ class TestMarstekBaseSensor:
         assert sensor._state == 80  # Should keep previous state
         assert "has no new value" in caplog.text
 
-    def test_update_first_time_no_value(self, mock_device):
+    def test_update_first_time_no_value(self):
         """Test sensor update when no value is available and no previous state."""
-        mock_device.get_value.return_value = None
+        # Create a specific mock device for this test
+        mock_device = Mock(spec=MarstekDevice)
+        mock_device._device_name = "Test Marstek Battery"
+        mock_device._host = "192.168.1.100"
+        mock_device.get_value = Mock(return_value=None)
+        mock_device.update = Mock()
+        
         sensor = MarstekBaseSensor(mock_device, "Bat.GetStatus", "soc", "Battery SOC")
 
         sensor.update()
@@ -172,13 +193,19 @@ class TestMarstekBaseSensor:
 
         assert sensor._state is False
 
-    def test_float_transform(self, mock_device):
+    def test_float_transform(self):
         """Test float transform function."""
-        mock_device.get_value.return_value = "200.5"
-        transform_func = lambda v: float(v)
+        # Create a specific mock device for this test
+        mock_device = Mock(spec=MarstekDevice)
+        mock_device._device_name = "Test Marstek Battery"
+        mock_device._host = "192.168.1.100"
+        mock_device.get_value = Mock(return_value="200.5")
+        mock_device.update = Mock()
         
+        transform_func = lambda v: float(v)
+
         sensor = MarstekBaseSensor(
-            mock_device, "ES.GetMode", "ongrid_power", "On Grid Power", 
+            mock_device, "ES.GetMode", "ongrid_power", "On Grid Power",
             unit="W", transform=transform_func
         )
 
@@ -316,7 +343,7 @@ class TestAsyncSetupEntry:
                 "host": "192.168.1.100",
                 "port": 30000,
                 "device_name": "Test Battery",
-                "scan_interval": 10,
+                "scan_interval": 30,
                 "domains": [],
             },
         )

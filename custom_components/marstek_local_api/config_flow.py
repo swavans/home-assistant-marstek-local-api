@@ -24,7 +24,7 @@ class MarstekConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 vol.Required(CONF_HOST): str,
                 vol.Required(CONF_PORT, default=30000): int,
                 vol.Required(CONF_DEVICE_NAME, default="Marstek Battery"): str,
-                vol.Optional(CONF_SCAN_INTERVAL, default=10): int,
+                vol.Optional(CONF_SCAN_INTERVAL, default=30): int,
                 vol.Optional(
                     CONF_DOMAINS,
                     default=list(OPTIONS.keys())
